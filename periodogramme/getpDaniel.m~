@@ -1,0 +1,9 @@
+function [ densite ] = getpDaniel(signal,n)
+%UNTITLED3 Summary of this function goes here
+%   Detailed explanation goes here
+    autocor_unbiased = fftshift(abs(fft(signal))).^2/length(signal);
+    
+    densite = filteautocor_unbiased, ones(1,n))/n;
+
+end
+
