@@ -6,7 +6,7 @@ function [ densite ] = getpDaniel(signal,n)
     bis2 = signal(1:n);
     
     densite = conv([bis1 autocor_unbiased bis2], ones(1,n))/n;
-    densite = densite(n+n/2:end-3*n/2);
+    densite = densite(n+n/2+1:end-3*n/2+1);
 
 end
 

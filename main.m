@@ -38,7 +38,11 @@ autocor_unbiased = xcorr(bruit,'unbiased');
 
 %% Periodogramme
 pdaniel = getpDaniel(bruit,n/100);
-pbarlett= getpBarlett(bruit,n/10);
-
+pbarlett= getpBartlett(bruit,n/10);
+pwelch= getWelch(bruit,n/10);
+figure,plot(bruit);
 figure,plot(pdaniel);
 figure,plot(pbarlett);
+figure,plot(pwelch);
+
+   pxx = pwelch(bruit)
