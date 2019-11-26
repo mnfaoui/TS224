@@ -1,7 +1,7 @@
 close all
 clear
 clc
-
+fe = 8e3;
 addpath('projet_signal-master/')
 addpath('periodogramme/')
 s1 = load('fcno03fz.mat');
@@ -45,4 +45,18 @@ figure,plot(pdaniel);
 figure,plot(pbarlett);
 figure,plot(pwelch);
 
-   pxx = pwelch(bruit)
+%% Correlogramme
+
+correlogramme = getCorrelogramme(bruit);
+figure,plot(correlogramme);
+
+
+
+
+
+
+
+
+
+
+
