@@ -9,10 +9,10 @@ Fe=8e3;
 
 %% Declaration de variable
 
-SNR       = 2;
-lenWindow = 25e-3*Fe;  %% un signal de parole peut être modelise comme un signal quaso-stationnaire sur un intervalle de temps de 25 ms
-L         = 120;%
-windows   = window(@hanning,lenWindow);
+SNR       = 1;
+lenWindow = 30e-3*Fe;  %% un signal de parole peut être modelise comme un signal quaso-stationnaire sur un intervalle de temps de 25 ms
+L         = lenWindow/2+1;%
+windows   = window(@hamming,lenWindow);
 % windows   = ones(lenWindow,1);
 %% Bruit
 Vs  = var(s);%(s'*s)/length(s);
@@ -38,7 +38,8 @@ listU = zeros(L,L,nbTrame);
 listS = zeros(L,M,nbTrame);
 listV = zeros(M,M,nbTrame);
 
-threshold = sqrt(2*Vb*L);
+thresholdTrue = sqrt(2*Vb*L);
+threshold = sqrt(2*var(trame_rcv(:,2)./windows)*L);
 for noTrame=1:size(trame_rcv,2)
     H = hankel( trame_rcv(1:L,noTrame), trame_rcv(L:end,noTrame));
     [U,S,V] = svd(H);

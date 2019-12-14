@@ -9,10 +9,10 @@ Fe=8e3;
 
 %% Declaration de variable
 
-SNR       = 2;
-lenWindow = 25e-3*Fe;  %% un signal de parole peut être modelise comme un signal quaso-stationnaire sur un intervalle de temps de 25 ms
-L         = 120;%
-windows   = window(@hanning,lenWindow);
+SNR       = 0.5;
+lenWindow = 30e-3*Fe;  %% un signal de parole peut être modelise comme un signal quaso-stationnaire sur un intervalle de temps de 25 ms
+L         = lenWindow/2+1;%
+windows   = window(@hamming,lenWindow);
 % windows   = ones(lenWindow,1);
 %% Bruit
 Vs  = var(s);%(s'*s)/length(s);
@@ -38,7 +38,10 @@ listU = zeros(L,L,nbTrame);
 listS = zeros(L,M,nbTrame);
 listV = zeros(M,M,nbTrame);
 
-threshold = sqrt(2*Vb*L);
+thresholdTrue = sqrt(2*Vb*L);
+threshold = sqrt(2*var(trame_rcv(:,2)./windows)*L);
+sigmaNoise = sqrt(var(trame_rcv(:,2)./windows)*L);
+
 for noTrame=1:size(trame_rcv,2)
     H = hankel( trame_rcv(1:L,noTrame), trame_rcv(L:end,noTrame));
     [U,S,V] = svd(H);
@@ -50,18 +53,10 @@ for noTrame=1:size(trame_rcv,2)
     dia = diag(S);
     listValeurSing(noTrame) = max(S(:));
     
-%     i = 7;
-%     if(S(1,1)>threshold)
-% %         tmp = dia(1:end-1)-dia(2:end);
-% %         [~,i] = max(dia(3:end)-2*dia(2:end-1)+dia(1:end-2));
-% %         i = i+2;
-%           
-%         X=S.*(S>S(i,i));
-%     else
-%         X=S/1000;
-%     end
-%     
-    X=S.*(S>threshold);
+    X = zeros(size(S));
+    X(1:length(diag(S)),1:length(diag(S))) = diag(diag(S)-sigmaNoise);
+%     X(1:length(diag(S)),1:length(diag(S))) = diag(diag(S)-threshold);
+    X = X.*(X>0);
     Hbis = U*X*V';
     
     a     = Hbis;
@@ -70,8 +65,6 @@ for noTrame=1:size(trame_rcv,2)
     out   = accumarray(idx(:),a(:),[],@mean);
    
     trame_new(:,noTrame)= out;
-%     plot(out);
-
 end
 
 %% Reconstitution du signal
