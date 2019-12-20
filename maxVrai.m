@@ -3,13 +3,15 @@ clear
 clc
 
 %% Constantes
+addpath('fonction')
 s=load('./projet_signal-master/fcno03fz');
 s=s.fcno03fz;
 Fe=8e3;
 
 %% Declaration de variable
 
-SNR       = 0.5;
+SNR_dB    = 10;
+SNR       = 10^(SNR_dB/10);
 lenWindow = 30e-3*Fe;  %% un signal de parole peut être modelise comme un signal quaso-stationnaire sur un intervalle de temps de 25 ms
 L         = lenWindow/2+1;%
 windows   = window(@hamming,lenWindow);
@@ -112,3 +114,13 @@ figure
 spectrogram(s,windows,lenWindow/2,[],Fe,'yaxis')
 figure
 spectrogram(new_Signal,windows,lenWindow/2,[],Fe,'yaxis')
+
+%% Spectrogramme
+Specto = @(entry)afficheSpectrogramme(entry,windows,Fe);
+figure
+subplot(3,1,1)
+Specto(s);
+subplot(3,1,2)
+Specto(signal);
+subplot(3,1,3)
+Specto(new_Signal);

@@ -3,15 +3,17 @@ clear
 clc
 
 %% Constantes
+addpath(genpath('fonction'))
 s=load('./projet_signal-master/fcno03fz');
 s=s.fcno03fz;
 Fe=8e3;
 
 %% Declaration de variable
 
-SNR       = 1;
+SNR_dB    = 5;
+SNR       = 10^(SNR_dB/10);
 lenWindow = 30e-3*Fe;  %% un signal de parole peut être modelise comme un signal quaso-stationnaire sur un intervalle de temps de 25 ms
-L         = lenWindow/2+1;%
+L         = lenWindow*0.5;%
 windows   = window(@hamming,lenWindow);
 % windows   = ones(lenWindow,1);
 %% Bruit
@@ -24,7 +26,7 @@ signal = s + sqrt(Vb)*randn(size(s));
 
 %
 
-%% Hankel
+%% Hankelthreshold = sqrt(2*(windows'*windows)*Vb);
 
 trame_rcv = trameAvecFenetre;
 trame_new = zeros(size(trame_rcv));
@@ -39,7 +41,8 @@ listS = zeros(L,M,nbTrame);
 listV = zeros(M,M,nbTrame);
 
 thresholdTrue = sqrt(2*Vb*L);
-threshold = sqrt(2*var(trame_rcv(:,2)./windows)*L);
+threshold = sqrt(2*(windows'*windows)*Vb);
+% threshold = sqrt(2*var(trame_rcv(:,2)./windows)*L);
 for noTrame=1:size(trame_rcv,2)
     H = hankel( trame_rcv(1:L,noTrame), trame_rcv(L:end,noTrame));
     [U,S,V] = svd(H);
@@ -50,18 +53,7 @@ for noTrame=1:size(trame_rcv,2)
     
     dia = diag(S);
     listValeurSing(noTrame) = max(S(:));
-    
-%     i = 7;
-%     if(S(1,1)>threshold)
-% %         tmp = dia(1:end-1)-dia(2:end);
-% %         [~,i] = max(dia(3:end)-2*dia(2:end-1)+dia(1:end-2));
-% %         i = i+2;
-%           
-%         X=S.*(S>S(i,i));
-%     else
-%         X=S/1000;
-%     end
-%     
+     
     X=S.*(S>threshold);
     Hbis = U*X*V';
     
@@ -115,8 +107,20 @@ figure,plot(listValeurSing);
 hold on
 plot(threshold*ones(length(listValeurSing)));
 afficher(s,signal,signal_new)
+
+%% Spectrogramme
+Specto = @(entry)afficheSpectrogramme(entry,windows,Fe);
+figure
+subplot(3,1,1)
+Specto(s);
+subplot(3,1,2)
+Specto(signal);
+subplot(3,1,3)
+Specto(new_Signal);
+
+
 %%
 figure
-spectrogram(s,windows,lenWindow/2,[],Fe,'yaxis')
+plot(new_Signal-signal)
 figure
-spectrogram(new_Signal,windows,lenWindow/2,[],Fe,'yaxis')
+plot(signal)
