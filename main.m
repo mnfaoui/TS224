@@ -12,7 +12,7 @@ n = 10000;
 % bruit = @(n,sigma) randn(1,n)*sigma;
 
 bruit = randn(1,n)*sigma;
-
+axe_frq = @(N) (-N/2:N/2-1)*1/N;
 %% autocorrelation 
 % theorique  
 autocor_theo = zeros(1,n);
@@ -40,10 +40,21 @@ autocor_unbiased = xcorr(bruit,'unbiased');
 pdaniel = getpDaniel(bruit,n/100);
 pbarlett= getpBartlett(bruit,n/10);
 pwelch= getWelch(bruit,n/10);
-figure,plot(bruit);
-figure,plot(pdaniel);
-figure,plot(pbarlett);
-figure,plot(pwelch);
+
+subplot(311)
+plot((1:length(bruit))/length(bruit),bruit);
+xlabel('temps');
+title('Brut Blanc Gaussien Centré')
+
+subplot(312)
+plot(axe_frq(length(pbarlett)),pbarlett);
+title('Periodogramme de Bartlett')
+xlabel('frequence');
+
+subplot(313)
+plot(axe_frq(length(pwelch)),pwelch);
+title('Periodogramme de Welch')
+xlabel('frequence');
 
 %% Correlogramme
 

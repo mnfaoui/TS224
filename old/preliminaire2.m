@@ -3,7 +3,7 @@ close all
 clc
 Fe =8e3;
 
-signal=load('./projet_signal-master/fcno04fz.mat');
+signal=load('../projet_signal-master/fcno04fz.mat');
 signal=signal.fcno04fz;
 n=length(signal);
 

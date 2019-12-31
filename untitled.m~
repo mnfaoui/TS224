@@ -1,0 +1,34 @@
+clc
+close all
+clear
+
+N = 1000;
+NFFT = 2^(nextpow2(N)+5);
+
+w_p     = window(@rectwin,N);
+w_t     = window(@triang,N);
+w_hann  = window(@hann,N);
+w_hamm  = window(@hamming,N);
+
+W_p = fftshift(abs(fft(w_p,NFFT)));
+W_t = fftshift(abs(fft(w_t,NFFT)));
+W_hann = fftshift(abs(fft(w_hann,NFFT)));
+W_hamm = fftshift(abs(fft(w_hamm,NFFT)));
+
+afficher = @(s,title)plot(s,'DisplayName',title);
+
+figure(1)
+hold on
+afficher(w_p,'porte')
+afficher(w_t,'triangulaire')
+afficher(w_hann,'hann')
+afficher(w_hamm,'hamming')
+legend()
+
+figure(2)
+hold on
+afficher(10*log10(W_p),'porte')
+afficher(10*log10(W_t),'triangulaire')
+afficher(10*log10(W_hann),'hann')
+afficher(10*log10(W_hamm),'hamming')
+legend()

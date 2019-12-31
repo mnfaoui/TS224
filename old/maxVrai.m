@@ -3,14 +3,14 @@ clear
 clc
 
 %% Constantes
-addpath('fonction')
-s=load('./projet_signal-master/fcno03fz');
+addpath(genpath('fonction'))
+s=load('../projet_signal-master/fcno03fz');
 s=s.fcno03fz;
 Fe=8e3;
 
 %% Declaration de variable
 
-SNR_dB    = -5;
+SNR_dB    = 10;
 SNR       = 10^(SNR_dB/10);
 lenWindow = 30e-3*Fe;  %% un signal de parole peut être modelise comme un signal quaso-stationnaire sur un intervalle de temps de 25 ms
 L         = lenWindow*0.9;%
@@ -40,7 +40,7 @@ listV = zeros(M,M,nbTrame);
 
 
 
-sigmaNoise = 2*Vb*(windows'*windows);
+sigmaNoise = Vb*(windows'*windows);
 
 for noTrame=1:size(trame_rcv,2)
     H = hankel( trame_rcv(1:L,noTrame), trame_rcv(L:end,noTrame));
@@ -55,6 +55,7 @@ for noTrame=1:size(trame_rcv,2)
     
     X = diag( dia.*dia - sigmaNoise);
     X = X.*(X>0);
+    diag(X);
     X = sqrt(X);
     Hbis = U*X*V';
     
@@ -92,7 +93,7 @@ W(size(trame,1)/2+1:end-size(trame,1)/2) ...
 
 signal_new = new_Signal./W;
 
-
+%%
 figure,hold on
 plot(signal);
 plot(signal_new);
@@ -119,3 +120,8 @@ subplot(3,1,2)
 Specto(signal);
 subplot(3,1,3)
 Specto(new_Signal);
+
+%% SNR
+
+bruit_new = (s-signal_new);
+SNR_new   = var(signal_new)/var(bruit_new);
